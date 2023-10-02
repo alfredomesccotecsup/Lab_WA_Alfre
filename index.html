@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat con Socket.IO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://images5.alphacoders.com/430/thumbbig-430916.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+        }
+
+        .chat-container {
+            background-color: rgba(255, 255, 255, 0.7);
+            width: 80%; 
+            max-width: 800px; 
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-box,
+        .chat-box2 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-input,
+        .chat-input2 {
+            display: flex;
+            padding: 10px;
+            background-color: #F0F0F0;
+            justify-content: flex-end;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #F0F0F0;
+            justify-content: flex-end;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #128C7E;
+            padding: 10px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .status {
+            font-size: 0.9em;
+        }
+
+        .icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icons i {
+            font-size: 1.2em;
+        }
+
+        .chat-box {
+            background-image: url('https://images.alphacoders.com/129/thumbbig-1291744.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .chat-box2 {
+            background-image: url('https://images.alphacoders.com/176/thumbbig-176123.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+       
+        .chat-box {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        
+        .chat-box2 {
+            background-color: rgba(255, 255, 255, 0.7); 
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #128C7E;
+            padding: 10px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .status {
+            font-size: 0.9em;
+        }
+
+        .icons {
+            display: flex;
+            gap: 30px;
+        }
+
+        .icons i {
+            padding: 10px;
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 10px;
+            max-width: 80%;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .message.sent {
+            align-self: flex-start;
+            background-color: #E5E5EA;
+        }
+
+        .message.received {
+            align-self: flex-end;
+            background-color: #DCF8C6;
+        }
+
+        .message .user {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .message .content {
+            word-wrap: break-word;
+        }
+
+        .message .time {
+            font-size: 0.8em;
+            color: #888;
+            margin-left: auto;
+        }
+
+        .message .avatar {
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .message .avatar img {
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #F0F0F0;
+            justify-content: flex-end; 
+        }
+
+        
+        .chat-input2 {
+            display: flex;
+            padding: 10px;
+            background-color: #F0F0F0;
+            justify-content: flex-end; 
+        }
+
+        
+        .chat-input input[type="text"],
+        .chat-input input[type="url"],
+        .chat-input2 input[type="text"],
+        .chat-input2 input[type="url"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-left: 10px; 
+        }
+
+        
+        .chat-input button,
+        .chat-input2 button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #128C7E;
+            color: white;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover,
+        .chat-input2 button:hover {
+            background-color: #0D5E56;
+        }
+
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-alert-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .custom-alert button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #128C7E;
+            color: white;
+            cursor: pointer;
+        }
+
+        .custom-alert button:hover {
+            background-color: #0D5E56;
+        }
+
+        
+        .chat-input button,
+        .chat-input2 button {
+            font-size: 1em;
+        }
+
+        .chat-input input[type="text"],
+        .chat-input input[type="url"],
+        .chat-input2 input[type="text"],
+        .chat-input2 input[type="url"] {
+            font-size: 1em;
+            background-color: #fff;
+        }
+
+        
+        .chat-input button,
+        .chat-input2 button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover,
+        .chat-input2 button:hover {
+            background-color: #45a049;
+        }
+
+       
+        .chat-input input[type="text"],
+        .chat-input input[type="url"],
+        .chat-input2 input[type="text"],
+        .chat-input2 input[type="url"] {
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1em;
+        }
+
+       
+        .chat-input input[type="text"],
+        .chat-input input[type="url"],
+        .chat-input2 input[type="text"],
+        .chat-input2 input[type="url"] {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        const socket = io();
+        let selectedImage1 = null;
+        let selectedImage2 = null;
+
+        function sendMessage() {
+            const username = document.getElementById('username').value;
+            const messageContent = document.getElementById('message').value;
+            const imageUrl = document.getElementById('image-url').value;
+            if (username.trim() !== '' && messageContent.trim() !== '' && imageUrl) {
+                const message = {
+                    user: username,
+                    message: messageContent,
+                    image: imageUrl,
+                    time: new Date().toLocaleTimeString().slice(0, -3),
+                    sentByMe: true
+                };
+                displayMessage(message, 'sent');
+                socket.emit('chat message 1', message);
+
+                saveMessageToDatabase(username, messageContent, imageUrl);
+
+                document.getElementById('message').value = '';
+                document.getElementById('sendButton1').disabled = true;
+            } else {
+                showCustomAlert('Por favor, completa todos los campos y proporciona una URL de imagen antes de enviar el mensaje.');
+            }
+        }
+
+        function sendMessage2() {
+            const username = document.getElementById('username2').value;
+            const messageContent = document.getElementById('message2').value;
+            const imageUrl = document.getElementById('image-url2').value; 
+
+            if (username.trim() !== '' && messageContent.trim() !== '' && imageUrl) {
+                const message = {
+                    user: username,
+                    message: messageContent,
+                    image: imageUrl,
+                    time: new Date().toLocaleTimeString().slice(0, -3),
+                    sentByMe: true
+                };
+                displayMessage(message, 'received');
+                socket.emit('chat message 2', message);
+
+                saveMessageToDatabase(username, messageContent, imageUrl);
+
+                document.getElementById('message2').value = '';
+                document.getElementById('sendButton2').disabled = true;
+            } else {
+                showCustomAlert('Por favor, completa todos los campos y proporciona una URL de imagen antes de enviar el mensaje.');
+            }
+        }
+
+        function saveMessageToDatabase(username, messageContent, image) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/save-message', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log('Mensaje guardado en la base de datos');
+                    } else {
+                        console.error('Error al guardar el mensaje en la base de datos');
+                    }
+                }
+            };
+            xhr.send(`usuario=${encodeURIComponent(username)}&mensaje=${encodeURIComponent(messageContent)}&imagen=${encodeURIComponent(image)}`);
+        }
+
+        function displayMessage(message, messageType) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(messageType);
+            messageDiv.innerHTML = `
+                <div class="avatar">
+                    <img src="${message.image || 'default-avatar.png'}" alt="Avatar">
+                </div>
+                <div>
+                    <span class="user">${message.user}</span>
+                    <div class="content">${message.message}</div>
+                    <span class="time">${message.time}</span>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('image-url').addEventListener('change', (event) => {
+            const imageUrl = event.target.value;
+            if (imageUrl) {
+                selectedImage1 = imageUrl;
+            }
+        });
+
+        document.getElementById('image-url2').addEventListener('change', (event) => {
+            const imageUrl = event.target.value;
+            if (imageUrl) {
+                selectedImage2 = imageUrl;
+            }
+        });
+
+        function checkInputs() {
+            const username = document.getElementById('username').value.trim();
+            const messageContent = document.getElementById('message').value.trim();
+            const imageUrl = document.getElementById('image-url').value.trim();
+            const username2 = document.getElementById('username2').value.trim();
+            const messageContent2 = document.getElementById('message2').value.trim();
+            const imageUrl2 = document.getElementById('image-url2').value.trim();
+
+            const sendButton1 = document.getElementById('sendButton1');
+            const sendButton2 = document.getElementById('sendButton2');
+
+            sendButton1.disabled = !(username && messageContent && imageUrl);
+            sendButton2.disabled = !(username2 && messageContent2 && imageUrl2);
+        }
+
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('customAlert');
+            const customAlertMessage = document.getElementById('customAlertMessage');
+
+            customAlertMessage.innerText = message;
+            customAlert.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            const customAlert = document.getElementById('customAlert');
+            customAlert.style.display = 'none';
+        }
+    </script>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="user-info">
+                <div class="avatar">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOgn5zkuE8_GhDfeAYO14vn1JgGXS6lx1Pyl-bzE9-TcBCvBvCIHMWfQFOsSajqkkjV3I&usqp=CAU" alt="Avatar">
+                </div>
+                <div class="user-details">
+                    <div class="username">Chat Prueba</div>
+                    <div class="status">Desconectado</div>
+                </div>
+            </div>
+            <div class="icons">
+                <i class="fas fa-video"></i>
+                <i class="fas fa-phone"></i> 
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
+        </div>
+
+        <div id="customAlert" class="custom-alert">
+            <div class="custom-alert-content">
+                <span id="customAlertMessage"></span>
+                <button onclick="closeCustomAlert()">OK</button>
+            </div>
+        </div>
+
+        
+        <div class="chat-box">
+            <div class="chat-messages" id="chat-messages">
+                
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="username" placeholder="Nombre" onkeyup="checkInputs()">
+                <input type="text" id="message" placeholder="Escribir mensaje" onkeyup="checkInputs()">
+                <input type="url" id="image-url" placeholder="URL de la imagen" onkeyup="checkInputs()">
+                <button onclick="sendMessage()" id="sendButton1" disabled>Enviar</button>
+            </div>
+        </div>
+
+        
+        <div class="chat-box2">
+            <div class="chat-messages" id="chat-messages2">
+                
+            </div>
+
+            <div class="chat-input2">
+                <input type="text" id="username2" placeholder="Nombre " onkeyup="checkInputs()">
+                <input type="text" id="message2" placeholder="Escribir mensaje" onkeyup="checkInputs()">
+                <input type="url" id="image-url2" placeholder="URL de la imagen" onkeyup="checkInputs()">
+                <button onclick="sendMessage2()" id="sendButton2" disabled>Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customAlert" class="custom-alert">
+        <div class="custom-alert-content">
+            <span id="customAlertMessage"></span>
+            <button onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./script.js"></script>
+</body>
+
+</html>
